@@ -2,6 +2,8 @@ import os
 import json
 import string
 
+from multiprocessing import Pool
+
 def normalizeText(text):
     # Remove punctuation
     text = text.translate(str.maketrans('', '', string.punctuation))
@@ -49,18 +51,21 @@ class JSONCorpusReader:
             return normalizeText(self.entries[fid][self.textKey]).split(" ")
         else:
             # Do it for all files
-            return {fid: self.words(fid) for fid in self.entries()}
+            return {fid: self.words(fid) for fid in self.entries()}  # type: ignore
         #END
     #END
 
-    def sentances(self, fid):
-        # Return the sentances
+    def sentences(self, fid):
+        # Return the sentences
         # Regex: \.+
         if fid:
-            " ".join([normalizeText(sentance) for sentance in self.entries[fid][self.textKey].split(".")])
+            " ".join([normalizeText(sentence) for sentence in self.entries[fid][self.textKey].split(".")])
         else:
             # Do it for all files
-            return {fid: self.sentances(fid) for fid in self.entries()}
+            return {fid: self.sentences(fid) for fid in self.entries()}  # type: ignore
         #END
     #END
+
+    def map(self, fn):
+        return [ fn(self.get(fid)) for fid in self.entries.keys() ]
 #END

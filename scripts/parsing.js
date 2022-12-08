@@ -1,7 +1,19 @@
 const fs = require("fs");
-const builder = require("xmlbuilder");
 
 const stream = fs.createReadStream("./train.csv")
+
+// If the data folder does not exist, create it.
+if (!fs.existsSync("./data")) {
+    fs.mkdirSync("./data");
+}
+
+// If the folders 'testing' and 'training' inside the data folder do not exist, create them.
+if (!fs.existsSync("./data/testing")) {
+    fs.mkdirSync("./data/testing");
+}
+if (!fs.existsSync("./data/training")) {
+    fs.mkdirSync("./data/training");
+}
 
 // Read csv data line by line
 const readline = require('readline');
@@ -14,8 +26,6 @@ let headers;
 rl.once("line", (line) => {
     // Split the line by comma
     headers = line.split(",");
-
-    // Remove the first two elements
 });
 
 let entries = 0;
@@ -35,47 +45,17 @@ rl.on('line', (line) => {
         return acc;
     }, {});
 
-    // const doc = builder.create("root");
-    // const tags = doc.ele("tags");
-    // doc.ele("content")
-    //     .txt(obj["text"])
-
-    // for (const entry of Object.keys(obj)) {
-    //     tags.att(entry.replace(">", "gt_").replace("<", "lt_"), obj[entry]);
-    // }
 
     // Add 2500 files to the train folder and 2500 to the test folder.
-    const folder = entries < 2500 ? "training" : "testing";
+    const folder = entries < 25000 ? "training" : "testing";
     fs.writeFileSync(`./data/${folder}/${obj["comment_id"]}.json`, JSON.stringify(obj, null, 4));
 
-
     entries++;
-    if (entries === 5000) {
+    if (entries === 50000) {
         rl.close();
         console.log("Done.")
     } else if (entries % 100 === 0) {
         console.log(`Processed ${entries} entries.`);
     }
 });
-    // for (let key in obj) {
-    //     // If key/value is a boolean
-    //     if (typeof obj[key] === "boolean") {
-    //         const label = key.replace(">", "gt_").replace("<", "lt_");
-    //         if (!fs.existsSync(`./training/${label}`)) {
-    //             fs.mkdirSync(`./training/${label}`);
-    //         }
 
-
-
-    //         for (const tag of (Object.keys(obj).filter((key) => obj[key] === true))) {
-    //             tags.att(tag.replace(">", "gt_").replace("<", "lt_"), "true");
-    //         }
-
-    //         doc.ele("content")
-    //             .txt(obj["text"])
-
-    //         fs.writeFileSync(`./training/${label}/${obj["comment_id"]}`, doc.toString({ pretty: true }));
-    //     }
-    // }
-//     console.log(doc.toString({ pretty: true }));
-// });

@@ -1,0 +1,10 @@
+# Filler / Generated Directories
+trainedModel
+trained
+scripts/node_modules
+example
+data/testing/*
+data/training/*
+vscode
+results/
+logs
